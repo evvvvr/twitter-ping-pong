@@ -1,0 +1,3 @@
+apply plugin: "application"
+
+mainClassName = "twitter_ping_pong.ping.Program"
