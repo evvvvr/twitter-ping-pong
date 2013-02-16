@@ -1,5 +1,7 @@
 package twitter_ping_pong.ping;
 
+import twitter4j.*;
+
 import java.util.*;
 
 public class Program {
@@ -14,9 +16,22 @@ public class Program {
         Scanner scanner = new Scanner(System.in);
         String command;
 
+        Twitter twitter = new TwitterFactory().getInstance();
+
+        boolean exit = false;
         do {
             System.out.print("Enter command: ");
             command = scanner.nextLine();
-        } while (!command.equals(EXIT_COMMAND));
+
+            if (command.equals(EXIT_COMMAND)) {
+                exit = true;
+            } else {
+                try {
+                    twitter.updateStatus("ping");
+                } catch (TwitterException e) {
+                    e.printStackTrace();
+                }
+            }
+        } while (!exit);
     }
 }

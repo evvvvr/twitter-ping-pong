@@ -1,3 +1,31 @@
 apply plugin: "application"
 
 mainClassName = "twitter_ping_pong.ping.Program"
+
+startScripts {
+    classpath += files('src/main/conf')
+
+    doLast {
+        def windowsScriptFile = file getWindowsScript()
+        def unixScriptFile    = file getUnixScript()
+        windowsScriptFile.text = windowsScriptFile.text.replace('%APP_HOME%\\lib\\conf', '%APP_HOME%\\conf')
+        unixScriptFile.text    = unixScriptFile.text.replace('$APP_HOME/lib/conf', '$APP_HOME/conf')
+   }
+}
+
+task processConfigs(type:Copy) {
+    from "src/main/conf"
+    into ("$buildDir/conf")
+
+    def sensibleProperties = new Properties()
+    file("sensetive.properties").withInputStream{
+        //noinspection GroovyAssignabilityCheck
+        sensibleProperties.load(it);
+    }
+
+    filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: sensibleProperties)
+}
+
+applicationDistribution.from(processConfigs) {
+    into "conf"
+}
