@@ -17,13 +17,13 @@ task processConfigs(type:Copy) {
     from "src/main/conf"
     into ("$buildDir/conf")
 
-    def sensibleProperties = new Properties()
-    file("sensetive.properties").withInputStream{
+    def sensitiveProperties = new Properties()
+    file("sensitive.properties").withInputStream{
         //noinspection GroovyAssignabilityCheck
-        sensibleProperties.load(it);
+        sensitiveProperties.load(it);
     }
 
-    filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: sensibleProperties)
+    filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: sensitiveProperties)
 }
 
 applicationDistribution.from(processConfigs) {
