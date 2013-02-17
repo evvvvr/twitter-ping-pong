@@ -1,14 +1,44 @@
-subprojects {
-    apply plugin: "java"
+apply plugin: "java"
 
-    repositories {
-        mavenCentral()
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "org.twitter4j:twitter4j-core:[3.0,)"
+    compile "org.twitter4j:twitter4j-stream:3.0.3"
+}
+
+sourceCompatibility = 1.7
+version = "0.1"
+
+apply plugin: "application"
+mainClassName = "twitter_ping_pong.Program"
+
+startScripts {
+    classpath += files('src/main/conf')
+
+    doLast {
+        def windowsScriptFile = file getWindowsScript()
+        def unixScriptFile    = file getUnixScript()
+        windowsScriptFile.text = windowsScriptFile.text.replace('%APP_HOME%\\lib\\conf', '%APP_HOME%\\conf')
+        unixScriptFile.text    = unixScriptFile.text.replace('$APP_HOME/lib/conf', '$APP_HOME/conf')
+   }
+}
+
+task processConfigs(type:Copy) {
+    from "src/main/conf"
+    into ("$buildDir/conf")
+
+    def sensitiveProperties = new Properties()
+    file("sensitive.properties").withInputStream{
+        //noinspection GroovyAssignabilityCheck
+        sensitiveProperties.load(it);
     }
 
-    dependencies {
-        compile "org.twitter4j:twitter4j-core:[3.0,)"
-    }
+    filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: sensitiveProperties)
+}
 
-    sourceCompatibility = 1.7
-    version = "0.1"
+applicationDistribution.from(processConfigs) {
+    into "conf"
 }

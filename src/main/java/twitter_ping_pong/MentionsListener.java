@@ -1,4 +1,4 @@
-package twitter_ping_pong.pong;
+package twitter_ping_pong;
 
 import twitter4j.*;
 
