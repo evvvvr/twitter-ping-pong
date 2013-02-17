@@ -17,8 +17,9 @@ class MentionsListener extends UserStreamAdapter  {
 
         try {
             long ownUserId = twitter.getId();
+            boolean isMentioned = isUserMentioned(status);
 
-            if (statusAuthor.getId() != ownUserId) {
+            if (statusAuthor.getId() != ownUserId && isMentioned) {
                 String statusAuthorScreenName = "@" + status.getUser().getScreenName();
 
                 System.out.println("Received status: " + status.getText());
@@ -32,5 +33,21 @@ class MentionsListener extends UserStreamAdapter  {
         } catch (TwitterException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private boolean isUserMentioned(Status status) throws TwitterException {
+        boolean isUserMentioned = false;
+        long ownUserId = twitter.getId();
+        UserMentionEntity[] allMentions = status.getUserMentionEntities();
+
+        for (UserMentionEntity userMention : allMentions) {
+            isUserMentioned = userMention.getId() == ownUserId;
+
+            if (isUserMentioned) {
+                break;
+            }
+        }
+
+        return isUserMentioned;
     }
 }
